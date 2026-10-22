@@ -1,0 +1,749 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ReviewIQ | Mobile Sentiment Analyzer</title>
+
+    <style>
+        :root {
+            --bg: #080d19;
+            --panel: #111a2c;
+            --panel-light: #172238;
+            --border: #26344d;
+            --text: #f1f5ff;
+            --muted: #9baac2;
+            --blue: #6295ff;
+            --blue-light: #9fc0ff;
+            --green: #43dda0;
+            --red: #ff777e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Arial, sans-serif;
+            background:
+                radial-gradient(ellipse at 15% 0%, #192c51 0%, transparent 42%),
+                radial-gradient(ellipse at 100% 80%, #172344 0%, transparent 38%),
+                var(--bg);
+            color: var(--text);
+        }
+
+        button, textarea {
+            font: inherit;
+        }
+
+        .navbar {
+            min-height: 76px;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.13);
+            background: rgba(8, 13, 25, 0.7);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 750;
+            letter-spacing: -0.6px;
+        }
+
+        .brand-icon {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 13px;
+            background: linear-gradient(145deg, #76a4ff, #4775ef);
+            color: white;
+            box-shadow: 0 5px 22px #4775ef40;
+            font-size: 22px;
+        }
+
+        .brand span {
+            color: var(--blue-light);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 13px;
+            border: 1px solid #294d47;
+            border-radius: 30px;
+            color: #a4efd1;
+            background: #102721;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 10px #43dda080;
+        }
+
+        main {
+            width: min(1100px, 90%);
+            margin: 0 auto;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 72px 0 38px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 13px;
+            border: 1px solid #30466c;
+            border-radius: 30px;
+            background: #14213a;
+            color: var(--blue-light);
+            font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .eyebrow-mark {
+            color: #7eacff;
+        }
+
+        h1 {
+            margin: 22px 0 15px;
+            font-size: clamp(35px, 5vw, 57px);
+            line-height: 1.1;
+            letter-spacing: -2px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #91b9ff, #a5a5ff, #77e0e7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-description {
+            max-width: 620px;
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.8fr);
+            gap: 22px;
+            align-items: start;
+            padding-bottom: 54px;
+        }
+
+        .card {
+            min-width: 0;
+            border: 1px solid var(--border);
+            border-radius: 21px;
+            background: linear-gradient(145deg, #131e32, #0e1728);
+            box-shadow: 0 24px 65px #00000025;
+        }
+
+        .analyzer {
+            padding: 28px;
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 25px;
+        }
+
+        .heading-icon {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 43px;
+            height: 43px;
+            border-radius: 13px;
+            background: #20345a;
+            color: #9bbcff;
+            font-size: 20px;
+        }
+
+        h2, h3, p {
+            margin-top: 0;
+        }
+
+        .card-heading h2 {
+            margin-bottom: 6px;
+            font-size: 20px;
+            letter-spacing: -0.4px;
+        }
+
+        .card-heading p {
+            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 11px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            min-height: 180px;
+            padding: 17px;
+            resize: vertical;
+            border: 1px solid #34435e;
+            border-radius: 14px;
+            outline: none;
+            background: #0a1221;
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.7;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        textarea::placeholder {
+            color: #71819c;
+        }
+
+        textarea:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px #6295ff19;
+        }
+
+        .input-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 9px;
+            color: #8494ad;
+            font-size: 11px;
+        }
+
+        .examples {
+            margin-top: 23px;
+        }
+
+        .examples-label {
+            margin-bottom: 11px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .example-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .example-btn {
+            padding: 9px 12px;
+            border: 1px solid #34435e;
+            border-radius: 9px;
+            background: #18253a;
+            color: #c6d4eb;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .example-btn:hover {
+            border-color: var(--blue);
+            color: white;
+            background: #203253;
+        }
+
+        .actions {
+            display: flex;
+            gap: 11px;
+            margin-top: 23px;
+        }
+
+        .predict-btn, .clear-btn {
+            min-height: 49px;
+            border-radius: 11px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 750;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .predict-btn {
+            flex: 1;
+            border: 0;
+            background: linear-gradient(100deg, #5687f7, #7868ed);
+            color: white;
+            box-shadow: 0 7px 24px #557bf52c;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(100deg, #6a98ff, #8979ff);
+        }
+
+        .clear-btn {
+            padding: 0 17px;
+            border: 1px solid #34435e;
+            background: transparent;
+            color: #c6d4eb;
+        }
+
+        .clear-btn:hover {
+            background: #1c2940;
+        }
+
+        .result {
+            margin-top: 23px;
+            padding: 19px;
+            border: 1px solid;
+            border-radius: 14px;
+            animation: appear 0.35s ease-out;
+        }
+
+        .result.positive {
+            border-color: #277f63;
+            background: linear-gradient(120deg, #10392f, #112b2b);
+        }
+
+        .result.negative {
+            border-color: #89444d;
+            background: linear-gradient(120deg, #451e2a, #301b2a);
+        }
+
+        .result-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .result-symbol {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #ffffff0d;
+            font-size: 22px;
+        }
+
+        .result h3 {
+            margin: 0 0 5px;
+            font-size: 18px;
+        }
+
+        .result.positive h3 {
+            color: #79efbd;
+        }
+
+        .result.negative h3 {
+            color: #ff969c;
+        }
+
+        .result p {
+            margin: 0;
+            color: #d3deed;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .side-card {
+            padding: 24px;
+        }
+
+        .side-title {
+            margin-bottom: 8px;
+            font-size: 17px;
+        }
+
+        .side-description {
+            margin-bottom: 22px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .sentiment-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 13px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #0c1525;
+        }
+
+        .sentiment-icon {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            font-size: 19px;
+        }
+
+        .sentiment-icon.good {
+            background: #153a31;
+            color: #70e8b6;
+        }
+
+        .sentiment-icon.bad {
+            background: #41232d;
+            color: #ff8e97;
+        }
+
+        .sentiment-item strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .sentiment-item small {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .method-box {
+            margin-top: 23px;
+            padding: 17px;
+            border: 1px solid #30466c;
+            border-radius: 13px;
+            background: #14213a;
+        }
+
+        .method-box .method-label {
+            margin-bottom: 9px;
+            color: var(--blue-light);
+            font-size: 10px;
+            font-weight: 750;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .method-box p {
+            margin: 0;
+            color: #d0dbee;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 22px 0 27px;
+            border-top: 1px solid #243149;
+            color: #8291a9;
+            font-size: 12px;
+        }
+
+        .footer strong {
+            color: #b9c8e1;
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .navbar {
+                padding: 15px 5%;
+            }
+
+            main {
+                width: 92%;
+            }
+
+            .hero {
+                padding-top: 52px;
+            }
+
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .side-card {
+                padding: 23px;
+            }
+
+            .footer {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 440px) {
+            .brand {
+                font-size: 17px;
+            }
+
+            .status {
+                padding: 8px;
+                font-size: 10px;
+            }
+
+            .analyzer {
+                padding: 19px;
+            }
+
+            h1 {
+                letter-spacing: -1px;
+            }
+
+            .hero-description {
+                font-size: 14px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .clear-btn {
+                min-height: 43px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon">R</div>
+            Review<span>IQ</span>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            ML Analyzer
+        </div>
+    </nav>
+
+    <main>
+        <header class="hero">
+            <div class="eyebrow">
+                <span class="eyebrow-mark">✦</span>
+                AI-powered review analysis
+            </div>
+
+            <h1>
+                Understand every<br>
+                <span class="gradient-text">customer opinion.</span>
+            </h1>
+
+            <p class="hero-description">
+                Turn mobile phone reviews into meaningful insights.
+                Enter a customer review and let our machine learning
+                model predict its sentiment in seconds.
+            </p>
+        </header>
+
+        <section class="workspace">
+            <div class="card analyzer">
+                <div class="card-heading">
+                    <div class="heading-icon">✎</div>
+                    <div>
+                        <h2>Analyze a review</h2>
+                        <p>Enter your review below to get a sentiment prediction.</p>
+                    </div>
+                </div>
+
+                <form method="POST" id="reviewForm">
+                    <label for="review">Customer review</label>
+
+                    <textarea
+                        id="review"
+                        name="review"
+                        maxlength="5000"
+                        placeholder="Example: The phone has a fantastic camera, smooth performance and excellent battery life..."
+                        required
+                    >{{ review }}</textarea>
+
+                    <div class="input-meta">
+                        <span>Describe your experience with the phone</span>
+                        <span id="charCount">0 / 5000</span>
+                    </div>
+
+                    <div class="examples">
+                        <div class="examples-label">TRY A SAMPLE REVIEW</div>
+
+                        <div class="example-buttons">
+                            <button type="button" class="example-btn"
+                                data-review="Excellent camera quality and amazing battery life.">
+                                ↗ Positive example
+                            </button>
+
+                            <button type="button" class="example-btn"
+                                data-review="The battery drains very fast and the phone is slow.">
+                                ↘ Negative example
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="predict-btn">
+                            Analyze Sentiment &nbsp; →
+                        </button>
+
+                        <button type="button" class="clear-btn" id="clearBtn">
+                            Clear
+                        </button>
+                    </div>
+                </form>
+
+                {% if prediction %}
+                    <section
+                        class="result {{ 'positive' if prediction == 'Positive' else 'negative' }}"
+                        aria-live="polite"
+                    >
+                        <div class="result-top">
+                            <div class="result-symbol">
+                                {{ '✓' if prediction == 'Positive' else '!' }}
+                            </div>
+
+                            <div>
+                                <h3>
+                                    {{ prediction }} Review
+                                </h3>
+
+                                <p>
+                                    {% if prediction == 'Positive' %}
+                                        The model predicts a positive customer opinion.
+                                    {% else %}
+                                        The model predicts a negative customer opinion.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
+            </div>
+
+            <aside class="card side-card">
+                <h2 class="side-title">What can it detect?</h2>
+
+                <p class="side-description">
+                    The model analyzes the words and patterns in a review
+                    to classify its overall sentiment.
+                </p>
+
+                <div class="sentiment-item">
+                    <div class="sentiment-icon good">✓</div>
+                    <div>
+                        <strong>Positive sentiment</strong>
+                        <small>Good quality, great battery, excellent camera</small>
+                    </div>
+                </div>
+
+                <div class="sentiment-item">
+                    <div class="sentiment-icon bad">!</div>
+                    <div>
+                        <strong>Negative sentiment</strong>
+                        <small>Poor performance, bad battery, disappointing quality</small>
+                    </div>
+                </div>
+
+                <div class="method-box">
+                    <div class="method-label">Behind the prediction</div>
+                    <p>
+                        <strong>TF-IDF</strong> converts review text into
+                        numerical features.<br>
+                        <strong>Logistic Regression</strong> predicts the
+                        sentiment using patterns learned during training.
+                    </p>
+                </div>
+            </aside>
+        </section>
+
+        <footer class="footer">
+            <span>© 2026 <strong>ReviewIQ</strong> · Academic ML Project</span>
+            <span>TF-IDF · Logistic Regression · Flask</span>
+        </footer>
+    </main>
+
+    <script>
+        const reviewInput = document.getElementById("review");
+        const charCount = document.getElementById("charCount");
+        const clearBtn = document.getElementById("clearBtn");
+        const reviewForm = document.getElementById("reviewForm");
+
+        function updateCount() {
+            charCount.textContent = reviewInput.value.length + " / 5000";
+        }
+
+        reviewInput.addEventListener("input", updateCount);
+
+        document.querySelectorAll(".example-btn").forEach(button => {
+            button.addEventListener("click", () => {
+                reviewInput.value = button.dataset.review;
+                updateCount();
+                reviewInput.focus();
+            });
+        });
+
+        clearBtn.addEventListener("click", () => {
+            reviewInput.value = "";
+            updateCount();
+            reviewInput.focus();
+        });
+
+        reviewForm.addEventListener("submit", event => {
+            if (!reviewInput.value.trim()) {
+                event.preventDefault();
+                reviewInput.focus();
+            }
+        });
+
+        updateCount();
+    </script>
+</body>
+</html>
+
